@@ -164,8 +164,12 @@ class DatabaseCommand
                 " is empty and login log wasn't inserted into the database."
             );
         } else {
-            $idAttribute = $this->databaseConnector->getUserIdAttribute();
-            $userId = isset($request['Attributes'][$idAttribute]) ? $request['Attributes'][$idAttribute][0] : null;
+            if (empty($this->databaseConnector->getUserIdAttribute())) {
+                $userIdAttribute = $request['rciamAttributes']['cuid'];
+            } else {
+                $userIdAttribute = $request['Attributes'][$this->databaseConnector->getUserIdAttribute()];
+            }
+            $userId = isset($userIdAttribute) ? $userIdAttribute[0] : null;
             if ($this->writeLogin($year, $month, $day, $idpEntityID, $spEntityId, $userId) === false) {
                 Logger::error("The login log wasn't inserted into table: " . $this->statisticsTableName . ".");
             }

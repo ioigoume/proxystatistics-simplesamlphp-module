@@ -109,7 +109,7 @@ class DatabaseConnector
         $this->spEntityId = $conf->getString(self::SP_ENTITY_ID, '');
         $this->spName = $conf->getString(self::SP_NAME, '');
         $this->detailedDays = $conf->getInteger(self::DETAILED_DAYS, 0);
-        $this->userIdAttribute = $conf->getString(self::USER_ID_ATTRIBUTE, 'uid');
+        $this->userIdAttribute = $conf->getString(self::USER_ID_ATTRIBUTE, '');
         $this->oidcIss = $conf->getString(self::OIDC_ISS, null);
     }
 

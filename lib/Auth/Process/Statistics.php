@@ -17,6 +17,7 @@ class Statistics extends ProcessingFilter
 {
     private $config;
     private $reserved;
+    private $userIdAttribute;
 
     public function __construct($config, $reserved)
     {
@@ -27,11 +28,16 @@ class Statistics extends ProcessingFilter
 
     public function process(&$request)
     {
+        if (empty($this->config->getString('userIdAttribute'))) {
+            $this->userIdAttribute = $request['rciamAttributes']['cuid'];
+        } else {
+            $this->userIdAttribute = $request['Attributes'][$this->config->getString('userIdAttribute')];
+        }
         // Check if user is in blacklist
-        if ((!empty($this->config->getString('userIdAttribute')) && !empty($request['Attributes'][$this->config->getString('userIdAttribute')]) && !empty($this->config->getArray('userIdBlacklist')) && !empty(array_intersect(
-            $request['Attributes'][$this->config->getString('userIdAttribute')],
-            $this->config->getArray('userIdBlacklist'))))) {
-            Logger::notice("[proxystatistics:proccess] Skipping blacklisted user with id " . var_export($request['Attributes'][$this->config->getString('userIdAttribute')], true));
+        if (!empty($this->userIdAttribute) && !empty($this->config->getArray('userIdBlacklist')) && !empty(array_intersect(
+            $this->userIdAttribute,
+            $this->config->getArray('userIdBlacklist')))) {
+            Logger::notice("[proxystatistics:proccess] Skipping blacklisted user with id " . var_export($this->userIdAttribute, true));
             return;
         }
 
@@ -44,8 +50,8 @@ class Statistics extends ProcessingFilter
         $sourceIdPEppn = '';
         $sourceIdPEntityId = '';
 
-        if (isset($request['Attributes'][$this->config->getString('userIdAttribute')][0])) {
-            $userIdentity = $request['Attributes'][$this->config->getString('userIdAttribute')][0];
+        if (isset($this->userIdAttribute[0])) {
+            $userIdentity = $this->userIdAttribute[0];
         }
         if (isset($request['Attributes']['sourceIdPEppn'][0])) {
             $sourceIdPEppn = $request['Attributes']['sourceIdPEppn'][0];
