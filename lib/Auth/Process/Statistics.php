@@ -29,7 +29,12 @@ class Statistics extends ProcessingFilter
     public function process(&$request)
     {
         if (empty($this->config->getString('userIdAttribute'))) {
-            $this->userIdAttribute = $request['rciamAttributes']['cuid'];
+            if (empty($request['rciamAttributes']['cuid'])) {
+                Logger::warning("[proxystatistics:proccess] There is not any defined User ID. This login will not be saved.");
+                return;
+            } else {
+                $this->userIdAttribute = $request['rciamAttributes']['cuid'];
+            }
         } else {
             $this->userIdAttribute = $request['Attributes'][$this->config->getString('userIdAttribute')];
         }
