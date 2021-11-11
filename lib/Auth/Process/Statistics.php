@@ -30,13 +30,18 @@ class Statistics extends ProcessingFilter
     {
         if (empty($this->config->getString('userIdAttribute'))) {
             if (empty($request['rciamAttributes']['cuid'])) {
-                Logger::warning("[proxystatistics:proccess] There is not any defined User ID. This login will not be saved.");
+                Logger::error("[proxystatistics:proccess] There is not any defined User ID. This login will not be saved.");
                 return;
             } else {
                 $this->userIdAttribute = $request['rciamAttributes']['cuid'];
             }
         } else {
-            $this->userIdAttribute = $request['Attributes'][$this->config->getString('userIdAttribute')];
+            if (empty($request['Attributes'][$this->config->getString('userIdAttribute')])) {
+                Logger::error("[proxystatistics:proccess] There is not any defined User ID. This login will not be saved.");
+                return;
+            } else {
+                $this->userIdAttribute = $request['Attributes'][$this->config->getString('userIdAttribute')];
+            }
         }
         // Check if user is in blacklist
         if (!empty($this->userIdAttribute) && !empty($this->config->getArray('userIdBlacklist')) && !empty(array_intersect(
