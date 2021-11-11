@@ -60,9 +60,7 @@ class Statistics extends ProcessingFilter
         $sourceIdPEppn = '';
         $sourceIdPEntityId = '';
 
-        if (isset($this->userIdAttribute[0])) {
-            $userIdentity = $this->userIdAttribute[0];
-        }
+        $userIdentity = $this->userIdAttribute[0];
         if (isset($request['Attributes']['sourceIdPEppn'][0])) {
             $sourceIdPEppn = $request['Attributes']['sourceIdPEppn'][0];
         }
