@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [v3.0.7-rciam] - 2021-11-12
 
 ### Added
 
