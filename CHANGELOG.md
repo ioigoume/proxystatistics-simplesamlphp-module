@@ -1,6 +1,12 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Added
+
+- Read `userIdAttribute` from state
+
 ## [v3.0.6-rciam] - 2021-04-27
 
 #### Fixed

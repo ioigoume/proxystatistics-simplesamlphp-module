@@ -114,7 +114,7 @@ class DatabaseCommand
         return $this->conn->write($query, $params);
     }
 
-    public function insertLogin(&$request, &$date)
+    public function insertLogin(&$request, &$date, &$userId)
     {
         if (!in_array($this->databaseConnector->getMode(), ['PROXY', 'IDP', 'SP'])) {
             throw new Exception('Unknown mode is set. Mode has to be one of the following: PROXY, IDP, SP.');
@@ -164,8 +164,6 @@ class DatabaseCommand
                 " is empty and login log wasn't inserted into the database."
             );
         } else {
-            $idAttribute = $this->databaseConnector->getUserIdAttribute();
-            $userId = isset($request['Attributes'][$idAttribute]) ? $request['Attributes'][$idAttribute][0] : null;
             if ($this->writeLogin($year, $month, $day, $idpEntityID, $spEntityId, $userId) === false) {
                 Logger::error("The login log wasn't inserted into table: " . $this->statisticsTableName . ".");
             }
