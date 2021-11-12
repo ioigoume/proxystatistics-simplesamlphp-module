@@ -30,14 +30,14 @@ class Statistics extends ProcessingFilter
     {
         if (empty($this->config->getString('userIdAttribute'))) {
             if (empty($request['rciamAttributes']['cuid'])) {
-                Logger::error("[proxystatistics:proccess] There is not any defined User ID. This login will not be saved.");
+                Logger::error("[proxystatistics:proccess] userIdAttribute has not been configured but ['rciamAttributes']['cuid'] is not available: This login cannot be recorded");
                 return;
             } else {
                 $this->userIdAttribute = $request['rciamAttributes']['cuid'];
             }
         } else {
             if (empty($request['Attributes'][$this->config->getString('userIdAttribute')])) {
-                Logger::error("[proxystatistics:proccess] There is not any defined User ID. This login will not be saved.");
+                Logger::error("[proxystatistics:proccess] userIdAttribute has been configured but ['Attributes']['" . $this->config->getString('userIdAttribute') . "'] is not available: This login cannot be recorded");
                 return;
             } else {
                 $this->userIdAttribute = $request['Attributes'][$this->config->getString('userIdAttribute')];
