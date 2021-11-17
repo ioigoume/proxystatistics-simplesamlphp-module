@@ -106,7 +106,7 @@ $config = [
      * Which attribute should be used as user ID.
      * @default uid
      */
-    'userIdAttribute' => 'uid',
+    'userIdAttribute' => null,
 
     /*
      * Which users should be blacklisted
