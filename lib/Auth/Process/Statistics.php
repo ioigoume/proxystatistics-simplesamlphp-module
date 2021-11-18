@@ -53,7 +53,7 @@ class Statistics extends ProcessingFilter
 
         $dateTime = new DateTime('now', new DateTimeZone( 'UTC' ));
         $dbCmd = new DatabaseCommand();
-        $dbCmd->insertLogin($request, $dateTime, $this->userIdAttribute);
+        $dbCmd->insertLogin($request, $dateTime, $this->userIdAttribute[0]);
         $spEntityId = $request['SPMetadata']['entityid'];
 
         $userIdentity = '';

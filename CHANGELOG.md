@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 
 - Fix default value of `userIdAttribute`
+- Fix parameter in `insertLogin()` call
 
 ## [v3.0.7-rciam] - 2021-11-12
 
