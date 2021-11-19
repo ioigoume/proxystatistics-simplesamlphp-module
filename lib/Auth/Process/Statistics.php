@@ -28,7 +28,7 @@ class Statistics extends ProcessingFilter
 
     public function process(&$request)
     {
-        if (empty($this->config->getString('userIdAttribute'))) {
+        if (empty($this->config->getString('userIdAttribute', null))) {
             if (empty($request['rciamAttributes']['cuid'])) {
                 Logger::error("[proxystatistics:proccess] userIdAttribute has not been configured but ['rciamAttributes']['cuid'] is not available: This login cannot be recorded");
                 return;
@@ -36,11 +36,11 @@ class Statistics extends ProcessingFilter
                 $this->userIdAttribute = $request['rciamAttributes']['cuid'];
             }
         } else {
-            if (empty($request['Attributes'][$this->config->getString('userIdAttribute')])) {
+            if (empty($request['Attributes'][$this->config->getString('userIdAttribute', null)])) {
                 Logger::error("[proxystatistics:proccess] userIdAttribute has been configured but ['Attributes']['" . $this->config->getString('userIdAttribute') . "'] is not available: This login cannot be recorded");
                 return;
             } else {
-                $this->userIdAttribute = $request['Attributes'][$this->config->getString('userIdAttribute')];
+                $this->userIdAttribute = $request['Attributes'][$this->config->getString('userIdAttribute', null)];
             }
         }
         // Check if user is in blacklist
@@ -53,7 +53,7 @@ class Statistics extends ProcessingFilter
 
         $dateTime = new DateTime('now', new DateTimeZone( 'UTC' ));
         $dbCmd = new DatabaseCommand();
-        $dbCmd->insertLogin($request, $dateTime, $this->userIdAttribute);
+        $dbCmd->insertLogin($request, $dateTime, $this->userIdAttribute[0]);
         $spEntityId = $request['SPMetadata']['entityid'];
 
         $userIdentity = '';
