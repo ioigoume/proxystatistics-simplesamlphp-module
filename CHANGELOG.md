@@ -1,6 +1,12 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [v3.0.9-rciam] - 2022-02-01
+
+### Fixed
+
+- Fix login statistics for newly registered users accessing OIDC clients
+
 ## [v3.0.8-rciam] - 2021-11-22
 
 ### Fixed
