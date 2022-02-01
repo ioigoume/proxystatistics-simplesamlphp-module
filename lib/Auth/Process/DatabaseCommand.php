@@ -138,6 +138,9 @@ class DatabaseCommand
                     $spEntityId = $request['saml:RequesterID'][0];
                     $spName = self::getSPDisplayName($request['Destination']);
                 }
+            } else if (!empty($request['saml:RelayState']) && !empty($this->databaseConnector->getOidcIssuer()) && strpos($request['Destination']['entityid'], $this->databaseConnector->getOidcIssuer()) !== false) {
+                $spEntityId = $request['saml:RelayState'];
+                $spName = null;
             } else {
                 $spEntityId = $request['Destination']['entityid'];
                 $spName = self::getSPDisplayName($request['Destination']);
