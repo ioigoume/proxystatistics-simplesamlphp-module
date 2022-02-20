@@ -145,6 +145,11 @@ $config = [
      */
     'oidcIssuer' => 'http://example.org/openidconnect/sp',
 
+    /*
+     * Fill the entityID of Keycloak Provider
+     */
+    'keycloakSp' => 'http://example.org/keykloak/sp',
+
     /**
      * Authentication source name if authentication should be required.
      * Defaults to empty string.

@@ -27,6 +27,7 @@ class DatabaseConnector
     private $userIdAttribute;
     private $conn = null;
     private $oidcIss;
+    private $keycloakSp;
 
     const CONFIG_FILE_NAME = 'module_statisticsproxy.php';
     /** @deprecated */
@@ -63,6 +64,7 @@ class DatabaseConnector
     const DETAILED_DAYS = 'detailedDays';
     const USER_ID_ATTRIBUTE = 'userIdAttribute';
     const OIDC_ISS = 'oidcIssuer';
+    const KEYCLOAK_SP = 'keycloakSp';
     const TABLE_PREFIX = 'database.prefix';
 
     public function __construct()
@@ -111,6 +113,7 @@ class DatabaseConnector
         $this->detailedDays = $conf->getInteger(self::DETAILED_DAYS, 0);
         $this->userIdAttribute = $conf->getString(self::USER_ID_ATTRIBUTE, null);
         $this->oidcIss = $conf->getString(self::OIDC_ISS, null);
+        $this->keycloakSp = $conf->getString(self::KEYCLOAK_SP, null);
     }
 
     public function getConnection()
@@ -185,7 +188,12 @@ class DatabaseConnector
     }
 
     public function getOidcIssuer()
-	{
-		return $this->oidcIss;
-	}
+    {
+      return $this->oidcIss;
+    }
+
+    public function getKeycloakSp()
+    {
+      return $this->keycloakSp;
+    }
 }

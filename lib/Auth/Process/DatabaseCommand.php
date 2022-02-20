@@ -130,22 +130,30 @@ class DatabaseCommand
             $idpName = self::getIdPDisplayName($idpMetadata);
         }
         if ($this->databaseConnector->getMode() !== 'SP') {
-            if (!empty($request['saml:RequesterID'])) {
-                if (!empty($this->databaseConnector->getOidcIssuer()) && (strpos($request['Destination']['entityid'], $this->databaseConnector->getOidcIssuer()) !== false)) {
-                    $spEntityId = str_replace($this->databaseConnector->getOidcIssuer() . "/", "", $request['saml:RequesterID'][0]);
-                    $spName = null;
-                } else {
-                    $spEntityId = $request['saml:RequesterID'][0];
-                    $spName = self::getSPDisplayName($request['Destination']);
-                }
-            } else if (!empty($request['saml:RelayState']) && !empty($this->databaseConnector->getOidcIssuer()) && strpos($request['Destination']['entityid'], $this->databaseConnector->getOidcIssuer()) !== false) {
-                $spEntityId = $request['saml:RelayState'];
-                $spName = null;
-            } else {
-                $spEntityId = $request['Destination']['entityid'];
-                $spName = self::getSPDisplayName($request['Destination']);
-            }
-        }
+          if (!empty($request['saml:RelayState']) 
+              && !empty($this->databaseConnector->getKeycloakSp()) 
+              && strpos($request['Destination']['entityid'], $this->databaseConnector->getKeycloakSp()) !== false) {
+            $spEntityId = explode('.', $request['saml:RelayState'], 3)[2];
+            $spName = null;
+          } else if (!empty($request['saml:RequesterID'])) {
+              if (!empty($this->databaseConnector->getOidcIssuer()) 
+                  && (strpos($request['Destination']['entityid'], $this->databaseConnector->getOidcIssuer()) !== false)) {
+                  $spEntityId = str_replace($this->databaseConnector->getOidcIssuer() . "/", "", $request['saml:RequesterID'][0]);
+                  $spName = null;
+              } else {
+                  $spEntityId = $request['saml:RequesterID'][0];
+                  $spName = self::getSPDisplayName($request['Destination']);
+              }
+          } else if (!empty($request['saml:RelayState']) 
+                     && !empty($this->databaseConnector->getOidcIssuer()) 
+                     && strpos($request['Destination']['entityid'], $this->databaseConnector->getOidcIssuer()) !== false) {
+              $spEntityId = $request['saml:RelayState'];
+              $spName = null;
+          } else {
+              $spEntityId = $request['Destination']['entityid'];
+              $spName = self::getSPDisplayName($request['Destination']);
+          }
+      }
 
         if ($this->databaseConnector->getMode() === 'IDP') {
             $idpName = $this->databaseConnector->getIdpName();
