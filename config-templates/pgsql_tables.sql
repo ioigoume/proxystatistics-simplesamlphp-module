@@ -33,8 +33,7 @@ CREATE TABLE IF NOT EXISTS statistics_ip (
     service character varying(255) NOT NULL,
     userid character varying(255) NOT NULL,
     ip CIDR NOT NULL,
-    ipversion VARCHAR(4) NOT NULL,
-    PRIMARY KEY (accessed, sourceidp, service, userid, ip, ipversion)
+    ipversion VARCHAR(4) NOT NULL
 );
 
 CREATE INDEX IF NOT EXISTS statistics_ip_i1 ON statistics_ip (accessed);

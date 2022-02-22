@@ -35,8 +35,7 @@ CREATE TABLE statistics_ip (
     INDEX (sourceIdp),
     INDEX (service),
     INDEX (user),
-    INDEX (ipVersion),
-    PRIMARY KEY (accessed, sourceIdp, service, user, ip, ipVersion)
+    INDEX (ipVersion)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --Tables for mapping identifier to name
