@@ -1,6 +1,12 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [v3.0.10-rciam] - 2022-02-22
+
+### Changed
+
+- Remove unique constraint on IP statistics table to allow concurrent logins
+
 ## [v3.0.9-rciam] - 2022-02-01
 
 ### Fixed
