@@ -1,6 +1,12 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [v3.1.0-rciam] - 2022-04-20
+
+### Added
+
+- Support for Keycloak via `keycloakSp` config option
+
 ## [v3.0.10-rciam] - 2022-02-22
 
 ### Changed
