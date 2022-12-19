@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * Script for migrate statistics data from version < 1.6.x to version > 2.0.0

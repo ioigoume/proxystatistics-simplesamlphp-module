@@ -44,14 +44,16 @@ class Statistics extends ProcessingFilter
             }
         }
         // Check if user is in blacklist
-        if (!empty($this->userIdAttribute) && !empty($this->config->getArray('userIdBlacklist')) && !empty(array_intersect(
-            $this->userIdAttribute,
-            $this->config->getArray('userIdBlacklist')))) {
+        if (
+            !empty($this->userIdAttribute)
+            && !empty($this->config->getArray('userIdBlacklist'))
+            && !empty(array_intersect($this->userIdAttribute, $this->config->getArray('userIdBlacklist')))
+        ) {
             Logger::notice("[proxystatistics:proccess] Skipping blacklisted user with id " . var_export($this->userIdAttribute, true));
             return;
         }
 
-        $dateTime = new DateTime('now', new DateTimeZone( 'UTC' ));
+        $dateTime = new DateTime('now', new DateTimeZone('UTC'));
         $dbCmd = new DatabaseCommand();
         $dbCmd->insertLogin($request, $dateTime, $this->userIdAttribute[0]);
         $spEntityId = $request['SPMetadata']['entityid'];
@@ -76,7 +78,5 @@ class Statistics extends ProcessingFilter
             Logger::notice('User identity: ' .  $userIdentity . ', service: ' . $spEntityId .
                 ', external identity: ' . $sourceIdPEppn . ' from ' . $sourceIdPEntityId);
         }
-
     }
-
 }

@@ -24,7 +24,7 @@ $t->data['lastDays'] = filter_input(
     INPUT_GET,
     'lastDays',
     FILTER_VALIDATE_INT,
-    ['options'=>['default'=>0,'min_range'=>0]]
+    ['options' => ['default' => 0, 'min_range' => 0]]
 );
 $t->data['tab'] = 0;
 

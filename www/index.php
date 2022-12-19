@@ -30,7 +30,7 @@ $lastDays = filter_input(
     INPUT_POST,
     'lastDays',
     FILTER_VALIDATE_INT,
-    ['options'=>['default'=>0,'min_range'=>0]]
+    ['options' => ['default' => 0, 'min_range' => 0]]
 );
 
 $t->data['lastDays'] = $lastDays;
@@ -39,7 +39,7 @@ $t->data['tab'] = filter_input(
     INPUT_POST,
     'tab',
     FILTER_VALIDATE_INT,
-    ['options'=>['default'=>0,'min_range'=>1]]
+    ['options' => ['default' => 0, 'min_range' => 1]]
 );
 
 if ($mode === 'IDP') {

@@ -133,7 +133,7 @@ class DatabaseConnector
 
     public function getIpStatisticsTableName()
     {
-      return $this->ipStatisticsTableName;
+        return $this->ipStatisticsTableName;
     }
 
     public function getIdentityProvidersMapTableName()
@@ -147,10 +147,10 @@ class DatabaseConnector
     }
 
     public function getDbDriver()
-	{
-		preg_match('/.+?(?=:)/', $this->databaseDsn, $driver);
-		return $driver[0];
-	}
+    {
+        preg_match('/.+?(?=:)/', $this->databaseDsn, $driver);
+        return $driver[0];
+    }
 
     public function getMode()
     {
@@ -189,11 +189,11 @@ class DatabaseConnector
 
     public function getOidcIssuer()
     {
-      return $this->oidcIss;
+        return $this->oidcIss;
     }
 
     public function getKeycloakSp()
     {
-      return $this->keycloakSp;
+        return $this->keycloakSp;
     }
 }
