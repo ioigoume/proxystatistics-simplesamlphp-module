@@ -1,5 +1,12 @@
 # Change Log
+
 All notable changes to this project will be documented in this file.
+
+## [Unreleased]
+
+### Fixed
+
+- Fix wrong condition when `RequesterID` is present in the SAML request
 
 ## [v3.1.0-rciam] - 2022-04-20
 

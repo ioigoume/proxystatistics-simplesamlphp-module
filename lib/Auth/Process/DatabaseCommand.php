@@ -135,15 +135,13 @@ class DatabaseCommand
               && strpos($request['Destination']['entityid'], $this->databaseConnector->getKeycloakSp()) !== false) {
             $spEntityId = explode('.', $request['saml:RelayState'], 3)[2];
             $spName = null;
-          } else if (!empty($request['saml:RequesterID'])) {
-              if (!empty($this->databaseConnector->getOidcIssuer()) 
-                  && (strpos($request['Destination']['entityid'], $this->databaseConnector->getOidcIssuer()) !== false)) {
-                  $spEntityId = str_replace($this->databaseConnector->getOidcIssuer() . "/", "", $request['saml:RequesterID'][0]);
-                  $spName = null;
-              } else {
-                  $spEntityId = $request['saml:RequesterID'][0];
-                  $spName = self::getSPDisplayName($request['Destination']);
-              }
+          } elseif (
+                !empty($request['saml:RequesterID'])
+                && !empty($this->databaseConnector->getOidcIssuer()) 
+                && (strpos($request['Destination']['entityid'], $this->databaseConnector->getOidcIssuer()) !== false)
+          ) {
+                $spEntityId = str_replace($this->databaseConnector->getOidcIssuer() . "/", "", $request['saml:RequesterID'][0]);
+                $spName = null;
           } else if (!empty($request['saml:RelayState']) 
                      && !empty($this->databaseConnector->getOidcIssuer()) 
                      && strpos($request['Destination']['entityid'], $this->databaseConnector->getOidcIssuer()) !== false) {
