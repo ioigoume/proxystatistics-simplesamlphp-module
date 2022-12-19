@@ -35,36 +35,34 @@ class DatabaseCommand
     private function writeLoginIp($sourceIdp, $service, $user, $ip, $date)
     {
         $params = [
-          'ip' => ($this->dbDriver == 'pgsql' ? $ip : inet_pton($ip)),
-          'sourceIdp' => $sourceIdp,
-          'service' => $service,
-          'accessed' => $date,
-          'ipVersion' => (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) ? 'ipv4' : 'ipv6')
+            'ip' => ($this->dbDriver == 'pgsql' ? $ip : inet_pton($ip)),
+            'sourceIdp' => $sourceIdp,
+            'service' => $service,
+            'accessed' => $date,
+            'ipVersion' => (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) ? 'ipv4' : 'ipv6')
         ];
         if ($this->dbDriver == 'pgsql') {
-          // the word "user" is reserved from PostgreSQL
-          $params['userid'] = $user;
+            // the word "user" is reserved from PostgreSQL
+            $params['userid'] = $user;
         } else {
-          $params['user'] = $user;
+            $params['user'] = $user;
         }
         $table = $this->ipStatisticsTableName;
         $fields = array_keys($params);
         $placeholders = array_map(function ($field) {
-          return ':' . $field;
-
+            return ':' . $field;
         }, $fields);
 
-        if(empty($params['ip'])) {
+        if (empty($params['ip'])) {
             Logger::error("[proxystatistics] Couldn't find ip for storing information to table");
             return false;
         }
         if ($this->dbDriver == 'pgsql') {
             $query = "INSERT INTO " . $table . " (" . implode(', ', $fields) . ")" .
-              " VALUES (" . implode(', ', $placeholders) . ")";
+                " VALUES (" . implode(', ', $placeholders) . ")";
         } else {
-           
             $query = "INSERT INTO " . $table . " (" . implode(', ', $fields) . ")" .
-              " VALUES (" . implode(', ', $placeholders) . ")";
+                " VALUES (" . implode(', ', $placeholders) . ")";
         }
 
         return $this->conn->write($query, $params);
@@ -94,7 +92,6 @@ class DatabaseCommand
         $fields = array_keys($params);
         $placeholders = array_map(function ($field) {
             return ':' . $field;
-
         }, $fields);
         if ($this->dbDriver == 'pgsql') {
             // remove count field from ON CONFLICT statement
@@ -102,13 +99,13 @@ class DatabaseCommand
             $pos = array_search('count', $conflictFields);
             unset($conflictFields[$pos]);
             $query = "INSERT INTO " . $table . " (" . implode(', ', $fields) . ")" .
-                     " VALUES (" . implode(', ', $placeholders) . ")" .
-                     " ON CONFLICT (" . implode(', ', $conflictFields) . ")" .
-                     " DO UPDATE SET count =  " . $table . ".count + 1";
+                " VALUES (" . implode(', ', $placeholders) . ")" .
+                " ON CONFLICT (" . implode(', ', $conflictFields) . ")" .
+                " DO UPDATE SET count =  " . $table . ".count + 1";
         } else {
             $query = "INSERT INTO " . $table . " (" . implode(', ', $fields) . ")" .
-                     " VALUES (" . implode(', ', $placeholders) . ")" .
-                     " ON DUPLICATE KEY UPDATE count = count + 1";
+                " VALUES (" . implode(', ', $placeholders) . ")" .
+                " ON DUPLICATE KEY UPDATE count = count + 1";
         }
 
         return $this->conn->write($query, $params);
@@ -130,28 +127,36 @@ class DatabaseCommand
             $idpName = self::getIdPDisplayName($idpMetadata);
         }
         if ($this->databaseConnector->getMode() !== 'SP') {
-          if (!empty($request['saml:RelayState']) 
-              && !empty($this->databaseConnector->getKeycloakSp()) 
-              && strpos($request['Destination']['entityid'], $this->databaseConnector->getKeycloakSp()) !== false) {
-            $spEntityId = explode('.', $request['saml:RelayState'], 3)[2];
-            $spName = null;
-          } elseif (
-                !empty($request['saml:RequesterID'])
-                && !empty($this->databaseConnector->getOidcIssuer()) 
-                && (strpos($request['Destination']['entityid'], $this->databaseConnector->getOidcIssuer()) !== false)
-          ) {
-                $spEntityId = str_replace($this->databaseConnector->getOidcIssuer() . "/", "", $request['saml:RequesterID'][0]);
+            if (
+                !empty($request['saml:RelayState'])
+                && !empty($this->databaseConnector->getKeycloakSp())
+                && strpos($request['Destination']['entityid'], $this->databaseConnector->getKeycloakSp()) !== false
+            ) {
+                $spEntityId = explode('.', $request['saml:RelayState'], 3)[2];
                 $spName = null;
-          } else if (!empty($request['saml:RelayState']) 
-                     && !empty($this->databaseConnector->getOidcIssuer()) 
-                     && strpos($request['Destination']['entityid'], $this->databaseConnector->getOidcIssuer()) !== false) {
-              $spEntityId = $request['saml:RelayState'];
-              $spName = null;
-          } else {
-              $spEntityId = $request['Destination']['entityid'];
-              $spName = self::getSPDisplayName($request['Destination']);
-          }
-      }
+            } elseif (
+                !empty($request['saml:RequesterID'])
+                && !empty($this->databaseConnector->getOidcIssuer())
+                && (strpos($request['Destination']['entityid'], $this->databaseConnector->getOidcIssuer()) !== false)
+            ) {
+                $spEntityId = str_replace(
+                    $this->databaseConnector->getOidcIssuer() . "/",
+                    "",
+                    $request['saml:RequesterID'][0]
+                );
+                $spName = null;
+            } elseif (
+                !empty($request['saml:RelayState'])
+                && !empty($this->databaseConnector->getOidcIssuer())
+                && strpos($request['Destination']['entityid'], $this->databaseConnector->getOidcIssuer()) !== false
+            ) {
+                $spEntityId = $request['saml:RelayState'];
+                $spName = null;
+            } else {
+                $spEntityId = $request['Destination']['entityid'];
+                $spName = self::getSPDisplayName($request['Destination']);
+            }
+        }
 
         if ($this->databaseConnector->getMode() === 'IDP') {
             $idpName = $this->databaseConnector->getIdpName();
@@ -170,7 +175,7 @@ class DatabaseCommand
         if (empty($idpEntityID) || empty($spEntityId)) {
             Logger::error(
                 "'idpEntityId' or 'spEntityId'" .
-                " is empty and login log wasn't inserted into the database."
+                    " is empty and login log wasn't inserted into the database."
             );
         } else {
             if ($this->writeLogin($year, $month, $day, $idpEntityID, $spEntityId, $userId) === false) {
@@ -182,41 +187,40 @@ class DatabaseCommand
             if (!empty($idpName)) {
                 if ($this->dbDriver == 'pgsql') {
                     $query = "INSERT INTO " . $this->identityProvidersMapTableName .
-                             " (entityId, name) VALUES (:idp, :name1) ON CONFLICT (entityId) DO UPDATE SET name = :name2";
+                        " (entityId, name) VALUES (:idp, :name1) ON CONFLICT (entityId) DO UPDATE SET name = :name2";
                 } else {
                     $query = "INSERT INTO " . $this->identityProvidersMapTableName .
-                             " (entityId, name) VALUES (:idp, :name1) ON DUPLICATE KEY UPDATE name = :name2";
+                        " (entityId, name) VALUES (:idp, :name1) ON DUPLICATE KEY UPDATE name = :name2";
                 }
                 $this->conn->write(
                     $query,
-                    ['idp'=>$idpEntityID, 'name1'=>$idpName, 'name2'=>$idpName]
+                    ['idp' => $idpEntityID, 'name1' => $idpName, 'name2' => $idpName]
                 );
             }
 
             if (!empty($spName)) {
                 if ($this->dbDriver == 'pgsql') {
                     $query = "INSERT INTO " . $this->serviceProvidersMapTableName .
-                             " (identifier, name) VALUES (:sp, :name1) ON CONFLICT (identifier) DO UPDATE SET name = :name2";
+                        " (identifier, name) VALUES (:sp, :name1) ON CONFLICT (identifier) DO UPDATE SET name = :name2";
                 } else {
                     $query = "INSERT INTO " . $this->serviceProvidersMapTableName .
-                             " (identifier, name) VALUES (:sp, :name1) ON DUPLICATE KEY UPDATE name = :name2";
+                        " (identifier, name) VALUES (:sp, :name1) ON DUPLICATE KEY UPDATE name = :name2";
                 }
                 $this->conn->write(
                     $query,
-                    ['sp'=>$spEntityId, 'name1'=>$spName, 'name2'=>$spName]
+                    ['sp' => $spEntityId, 'name1' => $spName, 'name2' => $spName]
                 );
             }
         }
-
     }
 
     public function getSpNameBySpIdentifier($identifier)
     {
         return $this->conn->read(
             "SELECT name " .
-            "FROM " . $this->serviceProvidersMapTableName . " " .
-            "WHERE identifier=:sp",
-            ['sp'=>$identifier]
+                "FROM " . $this->serviceProvidersMapTableName . " " .
+                "WHERE identifier=:sp",
+            ['sp' => $identifier]
         )->fetchColumn();
     }
 
@@ -224,21 +228,21 @@ class DatabaseCommand
     {
         return $this->conn->read(
             "SELECT name " .
-            "FROM " . $this->identityProvidersMapTableName . " " .
-            "WHERE entityId=:idp",
-            ['idp'=>$idpEntityId]
+                "FROM " . $this->identityProvidersMapTableName . " " .
+                "WHERE entityId=:idp",
+            ['idp' => $idpEntityId]
         )->fetchColumn();
     }
 
     public function getLoginCountPerDay($days)
     {
         $query = "SELECT year, month, day, SUM(count) AS count " .
-                 "FROM " . $this->statisticsTableName . " " .
-                 "WHERE service != '' ";
+            "FROM " . $this->statisticsTableName . " " .
+            "WHERE service != '' ";
         $params = [];
         self::addDaysRange($days, $this->dbDriver, $query, $params);
         $query .= "GROUP BY year,month,day " .
-                  "ORDER BY year ASC,month ASC,day ASC";
+            "ORDER BY year ASC,month ASC,day ASC";
 
         return $this->conn->read($query, $params)->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -246,12 +250,12 @@ class DatabaseCommand
     public function getLoginCountPerDayForService($days, $spIdentifier)
     {
         $query = "SELECT year, month, day, SUM(count) AS count " .
-                 "FROM " . $this->statisticsTableName . " " .
-                 "WHERE service=:service ";
+            "FROM " . $this->statisticsTableName . " " .
+            "WHERE service=:service ";
         $params = ['service' => $spIdentifier];
         self::addDaysRange($days, $this->dbDriver, $query, $params);
         $query .= "GROUP BY year,month,day " .
-                  "ORDER BY year ASC,month ASC,day ASC";
+            "ORDER BY year ASC,month ASC,day ASC";
 
         return $this->conn->read($query, $params)->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -259,12 +263,12 @@ class DatabaseCommand
     public function getLoginCountPerDayForIdp($days, $idpIdentifier)
     {
         $query = "SELECT year, month, day, SUM(count) AS count " .
-                 "FROM " . $this->statisticsTableName . " " .
-                 "WHERE sourceIdP=:sourceIdP ";
-        $params = ['sourceIdP'=>$idpIdentifier];
+            "FROM " . $this->statisticsTableName . " " .
+            "WHERE sourceIdP=:sourceIdP ";
+        $params = ['sourceIdP' => $idpIdentifier];
         self::addDaysRange($days, $this->dbDriver, $query, $params);
         $query .= "GROUP BY year,month,day " .
-                  "ORDER BY year ASC,month ASC,day ASC";
+            "ORDER BY year ASC,month ASC,day ASC";
 
         return $this->conn->read($query, $params)->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -273,16 +277,16 @@ class DatabaseCommand
     {
         if ($this->dbDriver == 'pgsql') {
             $query = "SELECT COALESCE(name,service) AS spname, service, SUM(count) AS count " .
-                     "FROM " . $this->serviceProvidersMapTableName . " " .
-                     "LEFT OUTER JOIN " . $this->statisticsTableName . " ON service = identifier ";
+                "FROM " . $this->serviceProvidersMapTableName . " " .
+                "LEFT OUTER JOIN " . $this->statisticsTableName . " ON service = identifier ";
             $querySuffix = "GROUP BY service, name HAVING service != '' " .
-                           "ORDER BY count DESC";
+                "ORDER BY count DESC";
         } else {
             $query = "SELECT IFNULL(name,service) AS spName, service, SUM(count) AS count " .
-                     "FROM " . $this->serviceProvidersMapTableName . " " .
-                     "LEFT OUTER JOIN " . $this->statisticsTableName . " ON service = identifier ";
+                "FROM " . $this->serviceProvidersMapTableName . " " .
+                "LEFT OUTER JOIN " . $this->statisticsTableName . " ON service = identifier ";
             $querySuffix = "GROUP BY service HAVING service != '' " .
-                           "ORDER BY count DESC";
+                "ORDER BY count DESC";
         }
         $params = [];
         self::addDaysRange($days, $this->dbDriver, $query, $params);
@@ -295,16 +299,16 @@ class DatabaseCommand
     {
         if ($this->dbDriver == 'pgsql') {
             $query = "SELECT COALESCE(name,sourceIdp) AS idpname, SUM(count) AS count " .
-                     "FROM " . $this->identityProvidersMapTableName . " " .
-                     "LEFT OUTER JOIN " . $this->statisticsTableName . " ON sourceIdp = entityId ";
+                "FROM " . $this->identityProvidersMapTableName . " " .
+                "LEFT OUTER JOIN " . $this->statisticsTableName . " ON sourceIdp = entityId ";
             $querySuffix = "GROUP BY sourceIdp, service, idpname HAVING sourceIdp != '' AND service=:service " .
-                           "ORDER BY count DESC";
+                "ORDER BY count DESC";
         } else {
             $query = "SELECT IFNULL(name,sourceIdp) AS idpname, SUM(count) AS count " .
-                     "FROM " . $this->identityProvidersMapTableName . " " .
-                     "LEFT OUTER JOIN " . $this->statisticsTableName . " ON sourceIdp = entityId ";
+                "FROM " . $this->identityProvidersMapTableName . " " .
+                "LEFT OUTER JOIN " . $this->statisticsTableName . " ON sourceIdp = entityId ";
             $querySuffix = "GROUP BY sourceIdp, service HAVING sourceIdp != '' AND service=:service " .
-                           "ORDER BY count DESC";
+                "ORDER BY count DESC";
         }
         $params = ['service' => $spIdentifier];
         self::addDaysRange($days, $this->dbDriver, $query, $params);
@@ -317,18 +321,18 @@ class DatabaseCommand
     {
         if ($this->dbDriver == 'pgsql') {
             $query = "SELECT COALESCE(name,service) AS spname, SUM(count) AS count " .
-                     "FROM " . $this->serviceProvidersMapTableName . " " .
-                     "LEFT OUTER JOIN " . $this->statisticsTableName . " ON service = identifier ";
+                "FROM " . $this->serviceProvidersMapTableName . " " .
+                "LEFT OUTER JOIN " . $this->statisticsTableName . " ON service = identifier ";
             $querySuffix = "GROUP BY sourceIdp, service, name HAVING service != '' AND sourceIdp=:sourceIdp " .
-                           "ORDER BY count DESC";
+                "ORDER BY count DESC";
         } else {
             $query = "SELECT IFNULL(name,service) AS spname, SUM(count) AS count " .
-                     "FROM " . $this->serviceProvidersMapTableName . " " .
-                     "LEFT OUTER JOIN " . $this->statisticsTableName . " ON service = identifier ";
+                "FROM " . $this->serviceProvidersMapTableName . " " .
+                "LEFT OUTER JOIN " . $this->statisticsTableName . " ON service = identifier ";
             $querySuffix = "GROUP BY sourceIdp, service HAVING service != '' AND sourceIdp=:sourceIdp " .
-                           "ORDER BY count DESC";
+                "ORDER BY count DESC";
         }
-        $params = ['sourceIdp'=>$idpEntityId];
+        $params = ['sourceIdp' => $idpEntityId];
         self::addDaysRange($days, $this->dbDriver, $query, $params);
         $query .= $querySuffix;
 
@@ -339,16 +343,16 @@ class DatabaseCommand
     {
         if ($this->dbDriver == 'pgsql') {
             $query = "SELECT COALESCE(name,sourceIdp) AS idpname, sourceidp, SUM(count) AS count " .
-                     "FROM " . $this->identityProvidersMapTableName . " " .
-                     "LEFT OUTER JOIN " . $this->statisticsTableName . " ON sourceIdp = entityId ";
+                "FROM " . $this->identityProvidersMapTableName . " " .
+                "LEFT OUTER JOIN " . $this->statisticsTableName . " ON sourceIdp = entityId ";
             $querySuffix = "GROUP BY sourceidp, name HAVING sourceIdp != '' " .
-                           "ORDER BY count DESC";
+                "ORDER BY count DESC";
         } else {
             $query = "SELECT IFNULL(name,sourceIdp) AS idpName, sourceIdp, SUM(count) AS count " .
-                     "FROM " . $this->identityProvidersMapTableName . " " .
-                     "LEFT OUTER JOIN " . $this->statisticsTableName . " ON sourceIdp = entityId ";
+                "FROM " . $this->identityProvidersMapTableName . " " .
+                "LEFT OUTER JOIN " . $this->statisticsTableName . " ON sourceIdp = entityId ";
             $querySuffix = "GROUP BY sourceIdp HAVING sourceIdp != '' " .
-                           "ORDER BY count DESC";
+                "ORDER BY count DESC";
         }
         $params = [];
         self::addDaysRange($days, $this->dbDriver, $query, $params);
@@ -421,7 +425,7 @@ class DatabaseCommand
         return null;
     }
 
-    public static function getSPDisplayName($spMetadata) 
+    public static function getSPDisplayName($spMetadata)
     {
         if (!empty($spMetadata['name'])) {
             // TODO: Use \SimpleSAML\Locale\Translate::getPreferredTranslation()
