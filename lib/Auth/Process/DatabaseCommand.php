@@ -5,6 +5,7 @@ namespace SimpleSAML\Module\proxystatistics\Auth\Process;
 use SimpleSAML\Error\Exception;
 use SimpleSAML\Logger;
 use SimpleSAML\Metadata\MetaDataStorageHandler;
+use SimpleSAML\Module\proxystatistics\Utils;
 use PDO;
 
 /**
@@ -170,7 +171,7 @@ class DatabaseCommand
         $month = $date->format('m');
         $day = $date->format('d');
         $dateTimestamp = $date->format('Y-m-d H:i:s T');
-        $ip = $_SERVER['HTTP_X_REAL_IP'];
+        $ip = Utils::getClientIpAddress();
 
         if (empty($idpEntityID) || empty($spEntityId)) {
             Logger::error(

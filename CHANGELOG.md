@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Fixed
+
+- Fix recording of user's IP address
+
 ## [v3.1.1-rciam] - 2022-12-19
 
 ### Fixed
