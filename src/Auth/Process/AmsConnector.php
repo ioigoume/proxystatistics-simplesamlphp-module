@@ -44,6 +44,12 @@ class AmsConnector
   const TABLE_PREFIX = 'database.prefix';
   const  AMS_INJEST_ENDPOINT = '/ams/ingest';
 
+  const AMS_BASE_URL="https://msg-devel.argo.grnet.gr/v1";
+  const AMS_USER_TOKEN="24e2b1fa7e367a6722e16b94765264082fca56022ac68dcc8728c26376d65dd6";
+  const AMS_ADMIN_TOKEN="25bbd90ba4bb38df217bf02c5369dff30bb524a0ad0c4a5666bba602ee01d794";
+  private $topic_name = "metrics";
+  private $project_name = "AAIMETRICS";
+
   public function __construct()
   {
     $conf = Configuration::getConfig(self::CONFIG_FILE_NAME);
@@ -112,4 +118,29 @@ class AmsConnector
   {
     return $this->keycloakSp;
   }
+
+  public function sendToAms($data) {
+    $url = self::AMS_BASE_URL . "/projects/{$this->poject_name}/topics/{$this->topic_name}:publish";
+
+    $cURLConnection = curl_init();
+
+    curl_setopt($cURLConnection, CURLOPT_URL, $url);
+    curl_setopt($cURLConnection, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($cURLConnection, CURLOPT_HTTPHEADER, array(
+      "Content-Type: application/json",
+      "x-api-key: " . self::AMS_ADMIN_TOKEN,
+    ));
+    curl_setopt($cURLConnection, CURLOPT_HTTPHEADER, array(
+      "Content-Type: application/json",
+      "x-api-key: " . self::AMS_USER_TOKEN,
+    ));
+    curl_setopt($cURLConnection, CURLOPT_POSTFIELDS, json_encode($data));
+
+    $amd_response = curl_exec($cURLConnection);
+    curl_close($cURLConnection);
+
+    $jsonArrayResponse = json_decode($amd_response);
+
+  }
+
 }
