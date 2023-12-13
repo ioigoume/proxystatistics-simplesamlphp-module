@@ -15,18 +15,18 @@ use SimpleSAML\Logger;
  */
 class Statistics extends ProcessingFilter
 {
-    private $config;
-    private $reserved;
-    private $userIdAttribute;
+    private array $config;
+    private string $reserved;
+    private string $userIdAttribute;
 
-    public function __construct($config, $reserved)
+    public function __construct(array $config, string $reserved)
     {
         parent::__construct($config, $reserved);
         $this->config = Configuration::getConfig(DatabaseConnector::CONFIG_FILE_NAME);
         $this->reserved = (array)$reserved;
     }
 
-    public function process(&$request)
+    public function process(array &$request): void
     {
         if (empty($this->config->getString('userIdAttribute', null))) {
             if (empty($request['rciamAttributes']['cuid'])) {
@@ -54,6 +54,8 @@ class Statistics extends ProcessingFilter
         }
 
         $dateTime = new DateTime('now', new DateTimeZone('UTC'));
+
+        // TODO: This should become AMS send
         $dbCmd = new DatabaseCommand();
         $dbCmd->insertLogin($request, $dateTime, $this->userIdAttribute[0]);
         $spEntityId = $request['SPMetadata']['entityid'];
