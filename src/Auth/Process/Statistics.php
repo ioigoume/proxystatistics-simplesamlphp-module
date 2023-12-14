@@ -55,9 +55,8 @@ class Statistics extends ProcessingFilter
 
         $dateTime = new DateTime('now', new DateTimeZone('UTC'));
 
-        // TODO: This should become AMS send
-        $dbCmd = new DatabaseCommand();
-        $dbCmd->insertLogin($request, $dateTime, $this->userIdAttribute[0]);
+        $amsCmd = new AmsCommand();
+        $amsCmd->insertLogin($request, $dateTime, $this->userIdAttribute[0]);
         $spEntityId = $request['SPMetadata']['entityid'];
 
         $userIdentity = '';

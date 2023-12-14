@@ -69,11 +69,6 @@ class AmsConnector
     $this->keycloakSp = $conf->getString(self::KEYCLOAK_SP, null);
   }
 
-  public function getConnection()
-  {
-    return Database::getInstance($this->storeConfig);
-  }
-
   public function getMode()
   {
     return $this->mode;

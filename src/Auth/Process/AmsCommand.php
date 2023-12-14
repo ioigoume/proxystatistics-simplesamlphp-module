@@ -18,12 +18,10 @@ class AmsCommand
     public function __construct()
     {
         $this->amsConnector = new AmsConnector();
-        $this->conn = $this->amsConnector->getConnection();
-        assert($this->conn !== null);
     }
     private function writeLoginIp($sourceIdp, $service, $user, $ip, $date): void
     {
-        $params = [
+        $data = [
             'ip' => $ip,
             'user' => $user,
             'sourceIdp' => $sourceIdp,
@@ -32,11 +30,11 @@ class AmsCommand
             'ipVersion' => (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) ? 'ipv4' : 'ipv6')
         ];
 
-        // todo: Send to ams
+        $this->amsConnector->sendToAms($data);
     }
     private function writeLogin($year, $month, $day, $sourceIdp, $service, $user = null)
     {
-        $params = [
+        $data = [
             'year' => $year,
             'month' => $month,
             'day' => $day,
@@ -44,12 +42,12 @@ class AmsCommand
             'service' => $service,
             'count' => 1,
         ];
-        $table = $this->statisticsTableName;
+
         if ($user && $this->amsConnector->getDetailedDays() > 0) {
-          $params['user'] = $user;
+          $data['user'] = $user;
         }
 
-        // todo: Send ams
+      $this->amsConnector->sendToAms($data);
     }
 
     public function insertLogin(&$request, &$date, &$userId)
@@ -128,7 +126,7 @@ class AmsCommand
             if (!empty($idpName)) {
                 $data = ['entityId' => $idpEntityID, 'idpName' => $idpName, 'idpName2' => $idpName];
 
-                // todo: send to ams
+                $this->amsConnector->sendToAms($data);
             }
 
             if (!empty($spName)) {
@@ -137,7 +135,8 @@ class AmsCommand
                 'spName' => $spName,
                 'spName2' => $spName
               ];
-               // todo send to ams
+              $this->amsConnector->sendToAms($data);
+
             }
         }
     }
